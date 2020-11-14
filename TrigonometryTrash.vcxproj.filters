@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\small_definitions.cpp" />
+    <ClCompile Include="src\exception.cpp" />
+    <ClCompile Include="src\Graphics\AppInit.cpp" />
+    <ClCompile Include="src\Graphics\Shader.cpp" />
+    <ClCompile Include="src\Graphics\Transform.cpp" />
+    <ClCompile Include="src\Graphics\Camera.cpp" />
+    <ClCompile Include="src\Window\Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="header\header.hpp" />
+    <ClInclude Include="header\tests_with_ogl.hpp" />
+    <ClInclude Include="header\Window\Window.hpp" />
+    <ClInclude Include="header\Graphics\RenderingBase.hpp" />
+    <ClInclude Include="header\Graphics\AppInit.hpp" />
+    <ClInclude Include="header\Graphics\Shader.hpp" />
+    <ClInclude Include="header\System\exception.hpp" />
+    <ClInclude Include="header\Graphics\Camera.hpp" />
+    <ClInclude Include="header\Graphics\Vector.hpp" />
+    <ClInclude Include="header\Graphics\Matrix.hpp" />
+    <ClInclude Include="header\Graphics\Transform.hpp" />
+    <ClInclude Include="header\Graphics\Buffer.hpp" />
+  </ItemGroup>
+</Project>
