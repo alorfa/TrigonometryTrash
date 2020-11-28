@@ -243,12 +243,12 @@ namespace neon
 
 namespace indexing
 {
-	VertexBuffer2D* vert;
+	VertexBuffer* vert;
 	ColorBuffer3f* color;
 
 	void create()
 	{
-		vert = new VertexBuffer2D;
+		vert = new VertexBuffer;
 		color = new ColorBuffer3f;
 
 		vert->add({

@@ -8,8 +8,12 @@
 #include "Graphics/Shader.hpp"
 #include "System/exception.hpp"
 #include "Graphics/Vector.hpp"
-#include <Graphics/Transform.hpp>
+#include <Graphics/Transformable.hpp>
 #include <ctime>
+#include "Graphics/TestObject.hpp"
+#include "System/Clock.hpp"
+#include "System/FpsMenager.hpp"
+#include "Graphics/Image/Image.hpp"
 
 std::ostream& operator<<(std::ostream&, const glm::mat3&);
 std::ostream& operator<<(std::ostream&, const glm::mat4&);
@@ -19,6 +23,20 @@ using namespace hlvl::transform;
 using namespace hlvl::vector;
 using namespace hlvl::window;
 using namespace hlvl::shader;
+using namespace hlvl::camera;
+using namespace hlvl::clock;
+using namespace hlvl::fps_menager;
+using namespace hlvl::image;
+using namespace my;
+
+std::ostream& operator<<(std::ostream& stream, const Transform& t)
+{
+	stream << "[" << t.position.x << ", " << t.position.y << "], "
+		<< "[" << t.scale.x << ", " << t.scale.y << "], "
+		<< t.rotation;
+
+	return stream;
+}
 
 int main()
 {
@@ -43,10 +61,10 @@ int main()
 	Uniform uniform;
 	try
 	{
-		compiler.loadFromFile("shader/neon.glslv", Shader::Vertex, nullptr);
-		compiler.loadFromFile("shader/neon.glslf", Shader::Fragment, nullptr);
-		shader = compiler.link(nullptr);
-		uniform = shader.getLocation("back_color");
+		compiler.loadFromFile("shader/transform.vsh", Shader::Vertex);
+		compiler.loadFromFile("shader/transform.fsh", Shader::Fragment);
+		shader = compiler.link();
+		uniform = shader.getLocation("transform");
 	}
 	catch (hlvl::file_not_found& e)
 	{
@@ -59,50 +77,67 @@ int main()
 		exit(1);
 	}
 
-	/*
-	Transform2D test;
-	test.position.x = 5.f;
-	test.scale(2.f, 2.f);
-	Matrix4 matrix;
-	test.convertToMatrix(matrix);
-	std::cout << matrix << std::endl;
-	Point2D point(10.f, 20.f);
-	PRINT(matrix * glm::vec4(point, 0.f, 1.f));*/
-
-	Transform2D test;
-	double begin = clock();
-	for (size_t i = 0; i < 10000; i++)
-	{
-		test.move(0.1f, 0.f);
-		test.convertToMatrix();
-	}
-	PRINT(clock() - begin);
-
-	indexing::create();
+	Camera camera;
+	my::TestObject testObject;
+	testObject.setVertexBuffer({
+		{-0.5f, -0.5f},
+		{0.5f, -0.5f},
+		{0.f, 0.5f}
+	});
+	testObject.v_buffer.updateData();
+	testObject.setColorBuffer({
+		{1.f, 0.f, 0.f},
+		{0.f, 1.f, 0.f},
+		{0.f, 0.f, 1.f},
+	});
+	testObject.c_buffer.updateData();
 
 	Color3f fill_color(0.2f, 0.0f, 0.3f);
+
+	FpsMenager fps_menager;
+	fps_menager.setFps(60);
+
+	float delta = 0.f;
 
 	bool window_will_close = false;
 	while (window.isOpen())
 	{
+		delta = fps_menager.getDelta();
+		fps_menager.beginOfRendering();
+
 		if (window.shouldClose())
 			window_will_close = true;
 
 		window.clear(fill_color);
 
+		if (GetAsyncKeyState('D'))
+		{
+			testObject.move(0.50f * delta, 0.f);
+		}
+		if (GetAsyncKeyState('A'))
+		{
+			testObject.move(-0.50f * delta, 0.f);
+		}
+		Matrix4 mvp;
+		mvp = camera.getMatrix() * testObject.getMatrix();
+		PRINTR(delta);
+
 		Shader::use(&shader);
-		shader.setUniform(uniform, fill_color);
-		indexing::draw();
+		shader.setUniform(uniform, mvp);
+
+		testObject.v_buffer.activate();
+		testObject.c_buffer.activate();
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		testObject.c_buffer.deactivate();
+		testObject.v_buffer.deactivate();
 
 		window.display();		
 
-		Sleep(10);
-
 		if (window_will_close)
-			window.close();				
-	}
+			window.close();
 
-	indexing::destroy();
+		fps_menager.endOfRendering();
+	}
 
 	return 0;
 }

@@ -6,9 +6,12 @@
     <ClCompile Include="src\exception.cpp" />
     <ClCompile Include="src\Graphics\AppInit.cpp" />
     <ClCompile Include="src\Graphics\Shader.cpp" />
-    <ClCompile Include="src\Graphics\Transform.cpp" />
     <ClCompile Include="src\Graphics\Camera.cpp" />
     <ClCompile Include="src\Window\Window.cpp" />
+    <ClCompile Include="src\Graphics\Transformable.cpp" />
+    <ClCompile Include="src\System\Clock.cpp" />
+    <ClCompile Include="src\System\FpsMenager.cpp" />
+    <ClCompile Include="src\Graphics\Image\Image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header\header.hpp" />
@@ -21,7 +24,12 @@
     <ClInclude Include="header\Graphics\Camera.hpp" />
     <ClInclude Include="header\Graphics\Vector.hpp" />
     <ClInclude Include="header\Graphics\Matrix.hpp" />
-    <ClInclude Include="header\Graphics\Transform.hpp" />
     <ClInclude Include="header\Graphics\Buffer.hpp" />
+    <ClInclude Include="header\Graphics\Transformable.hpp" />
+    <ClInclude Include="header\Graphics\TestObject.hpp" />
+    <ClInclude Include="header\System\Clock.hpp" />
+    <ClInclude Include="header\System\FpsMenager.hpp" />
+    <ClInclude Include="header\Graphics\Image\Image.hpp" />
+    <ClInclude Include="header\Graphics\Image\ImageLoader.hpp" />
   </ItemGroup>
 </Project>

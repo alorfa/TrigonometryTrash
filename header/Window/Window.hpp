@@ -9,36 +9,44 @@
 #include "Graphics/Vector.hpp"
 #include <Graphics/Camera.hpp>
 
-using namespace hlvl::camera;
-
 namespace hlvl
 {
 namespace window
 {
 
 
-class Window
-{
-	GLFWwindow* window;
+	class Window
+	{
+		using CameraBase = camera::CameraBase;
+		using Color3f = vector::Color3f;
+		using Color3b = vector::Color3b;
 
-	CameraBase* camera;
-public:
-	Window();
-	bool create(GLuint width, GLuint height, const char* title);
-	Window(GLuint width, GLuint height, const char* title);
-	void close();
-	~Window();
+		GLFWwindow* window;
 
-	bool isOpen();
+		const CameraBase* camera;
 
-	bool shouldClose();
+		GLuint frame_limit;
+	public:
+		Window();
+		bool create(GLuint width, GLuint height, const char* title);
+		Window(GLuint width, GLuint height, const char* title);
+		Window(const Window&) = delete;
+		void close();
+		~Window();
 
-	void setCamera(CameraBase* new_camera);
+		bool isOpen();
 
-	void clear(const Color3b& fill);
-	void clear(const Color3f& fill);
-	void display();
-};
+		bool shouldClose();
+
+		void setFrameLimit(GLuint limit);
+		GLuint getFrameLimit();
+
+		void setCamera(const CameraBase& new_camera);
+
+		void clear(const Color3b& fill);
+		void clear(const Color3f& fill);
+		void display();
+	};
 
 
 }
