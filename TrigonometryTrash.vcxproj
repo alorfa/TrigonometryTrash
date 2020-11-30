@@ -132,7 +132,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Graphics\AppInit.cpp" />
-    <ClCompile Include="src\exception.cpp" />
+    <ClCompile Include="src\Graphics\Image\stb_image.c" />
+    <ClCompile Include="src\Graphics\Image\Texture.cpp" />
+    <ClCompile Include="src\System\exception.cpp" />
     <ClCompile Include="src\Graphics\Camera.cpp" />
     <ClCompile Include="src\Graphics\Image\Image.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -148,6 +150,7 @@
     <ClInclude Include="header\Graphics\Camera.hpp" />
     <ClInclude Include="header\Graphics\Image\Image.hpp" />
     <ClInclude Include="header\Graphics\Image\ImageLoader.hpp" />
+    <ClInclude Include="header\Graphics\Image\Texture.hpp" />
     <ClInclude Include="header\System\FpsMenager.hpp" />
     <ClInclude Include="header\Graphics\Matrix.hpp" />
     <ClInclude Include="header\Graphics\TestObject.hpp" />

@@ -24,14 +24,20 @@ namespace image
 		Image(Image&& other);
 		Image& operator=(Image&& other);
 
-		void create(Vector2u size, byte* data);
+		void create(Vector2u size, const byte* data);
 		void create(Vector2u size, const Color4b& fill);
 
-		void setPixel(Vector2u pos, const Color4b& color);
-		Color4b getPixel(Vector2u pos);
+		void loadFromFile(const char* filename);
+		void loadFromMemory(const byte* data, size_t size);
 
-		Vector2u getSize();
+		void setPixel(Vector2u pos, const Color4b& color);
+		
+		Vector2u getSize() const;
+		const Color4b* getPixels() const;
+		const Color4b& getPixel(Vector2u pos) const;
+
 		Color4b* getPixels();
+		Color4b& getPixel(Vector2u pos);
 	};
 
 }

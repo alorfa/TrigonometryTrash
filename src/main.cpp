@@ -14,6 +14,7 @@
 #include "System/Clock.hpp"
 #include "System/FpsMenager.hpp"
 #include "Graphics/Image/Image.hpp"
+#include "Graphics/Image/Texture.hpp"
 
 std::ostream& operator<<(std::ostream&, const glm::mat3&);
 std::ostream& operator<<(std::ostream&, const glm::mat4&);
@@ -28,6 +29,7 @@ using namespace hlvl::clock;
 using namespace hlvl::fps_menager;
 using namespace hlvl::image;
 using namespace my;
+using namespace hlvl::texture;
 
 std::ostream& operator<<(std::ostream& stream, const Transform& t)
 {
@@ -58,13 +60,18 @@ int main()
 	//open shaders
 	ShaderCompiler compiler;
 	Shader shader;
-	Uniform uniform;
+	Uniform uni_matrix;
+	Uniform uni_texture;
 	try
 	{
-		compiler.loadFromFile("shader/transform.vsh", Shader::Vertex);
-		compiler.loadFromFile("shader/transform.fsh", Shader::Fragment);
-		shader = compiler.link();
-		uniform = shader.getLocation("transform");
+		std::string s1, s2, s3;
+		compiler.loadFromFile("shader/texture.vert", Shader::Vertex, &s1);
+		compiler.loadFromFile("shader/texture.frag", Shader::Fragment, &s2);
+		shader = compiler.link(&s3);
+		uni_matrix = shader.getLocation("transform");
+		uni_texture = shader.getLocation("img");
+
+		std::cout << s1 << ' ' << s2 << ' ' << s3 << std::endl;
 	}
 	catch (hlvl::file_not_found& e)
 	{
@@ -80,22 +87,60 @@ int main()
 	Camera camera;
 	my::TestObject testObject;
 	testObject.setVertexBuffer({
-		{-0.5f, -0.5f},
-		{0.5f, -0.5f},
-		{0.f, 0.5f}
+		{-0.5f, -0.7f},
+		{0.5f, 0.7f},
+		{0.5f, -0.7f},
+		{-0.5f, -0.7f},
+		{0.5f, 0.7f},
+		{-0.5f, 0.7f}
 	});
 	testObject.v_buffer.updateData();
+	/*
 	testObject.setColorBuffer({
-		{1.f, 0.f, 0.f},
-		{0.f, 1.f, 0.f},
-		{0.f, 0.f, 1.f},
-	});
+		{1.f, 1.f, 0.f},
+		{1.f, 1.f, 1.f},
+		{0.2f, 1.f, 1.f},
+		{1.f, 1.f, 0.f},
+		{1.f, 1.f, 1.f},
+		{1.f, 1.f, 0.f},
+	});/**/
+	testObject.setColorBuffer({
+		{1.f, 0.f, 1.f},
+		{1.f, 0.f, 1.f},
+		{1.f, 0.f, 1.f},
+		{1.f, 0.f, 1.f},
+		{1.f, 0.f, 1.f},
+		{1.f, 0.f, 1.f},
+		});
 	testObject.c_buffer.updateData();
+	testObject.setCoordsBuffer({
+		{0.f, 1.f},
+		{1.f, 0.f},
+		{1.f, 1.f},
+		{0.f, 1.f},
+		{1.f, 0.f},
+		{0.f, 0.f}
+	});
+	testObject.cord_buffer.updateData();
 
 	Color3f fill_color(0.2f, 0.0f, 0.3f);
 
 	FpsMenager fps_menager;
 	fps_menager.setFps(60);
+
+	Image img;
+	try
+	{
+		img.loadFromFile("images/image.jpg");
+	}
+	catch (hlvl::image_error& e)
+	{
+		std::cerr << e.message << std::endl;
+	}
+	//PRINT(img.getSize());
+	//PRINT(img.getPixel({350, 500}));
+	Texture texture;
+	texture.setImage(img);
 
 	float delta = 0.f;
 
@@ -120,14 +165,20 @@ int main()
 		}
 		Matrix4 mvp;
 		mvp = camera.getMatrix() * testObject.getMatrix();
-		PRINTR(delta);
+		//PRINTR(delta);
+
+		texture.activate();
+
 
 		Shader::use(&shader);
-		shader.setUniform(uniform, mvp);
+		shader.setUniform(uni_matrix, mvp);
+		shader.setUniform(uni_texture, texture);
 
 		testObject.v_buffer.activate();
 		testObject.c_buffer.activate();
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		testObject.cord_buffer.activate();
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		testObject.cord_buffer.deactivate();
 		testObject.c_buffer.deactivate();
 		testObject.v_buffer.deactivate();
 

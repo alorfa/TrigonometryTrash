@@ -1,4 +1,5 @@
 #include "Graphics/Image/Image.hpp"
+#include "System/exception.hpp"
 
 #include <stb/stb_image.h>
 
@@ -25,7 +26,7 @@ namespace image
 		return *this;
 	}
 
-	void Image::create(Vector2u size, byte* data)
+	void Image::create(Vector2u size, const byte* data)
 	{
 		this->size = size;
 
@@ -55,17 +56,72 @@ namespace image
 		}
 	}
 
-	void Image::setPixel(Vector2u pos, const Color4b& color)
+	void Image::loadFromFile(const char* filename)
+	{
+		int width = 0;
+		int height = 0;
+		int channels = 0;
+		byte* new_data = stbi_load(filename, &width, &height, &channels, STBI_rgb_alpha);
+
+		if (new_data)
+		{
+			create(Vector2u(width, height), new_data);
+
+			stbi_image_free(new_data);
+		}
+		else
+		{
+			throw image_error(stbi_failure_reason());
+		}
+
+
+	}
+	void Image::loadFromMemory(const byte* data, size_t size)
+	{
+		if (data && size)
+		{
+			int width = 0;
+			int height = 0;
+			int channels = 0;
+			byte* new_data = stbi_load_from_memory(data, (int)size, &width, &height, &channels, STBI_rgb_alpha);
+
+			if (new_data)
+			{
+				create(Vector2u(width, height), new_data);
+
+				stbi_image_free(new_data);
+			}
+			else
+			{
+				throw image_error(stbi_failure_reason());
+			}
+		}
+		else
+		{
+			throw image_error("Uncorrect data!");
+		}
+	}
+
+	void Image::setPixel(Vector2u pos, const Color4b& color) 
 	{
 		pixels[pos.x + pos.y * size.x] = color;
 	}
-	Color4b Image::getPixel(Vector2u pos)
+
+	Vector2u Image::getSize() const
+	{
+		return size;
+	}
+	const Color4b& Image::getPixel(Vector2u pos) const
 	{
 		return pixels[pos.x + pos.y * size.x];
 	}
-	Vector2u Image::getSize()
+	const Color4b* Image::getPixels() const
 	{
-		return size;
+		return pixels.data();
+	}
+	Color4b& Image::getPixel(Vector2u pos)
+	{
+		return pixels[pos.x + pos.y * size.x];
 	}
 	Color4b* Image::getPixels()
 	{

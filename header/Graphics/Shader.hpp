@@ -5,6 +5,7 @@
 #include <vector>
 #include "Graphics/Vector.hpp"
 #include "Graphics/Matrix.hpp"
+#include "Graphics/Image/Texture.hpp"
 
 using namespace hlvl::vector;
 using namespace hlvl::matrix;
@@ -13,8 +14,6 @@ namespace hlvl
 {
 namespace shader
 {
-
-
 	typedef GLint Uniform;
 
 	class ShaderCompiler;
@@ -22,6 +21,8 @@ namespace shader
 	class Shader
 	{
 		friend class ShaderCompiler;
+
+		using Texture = texture::Texture;
 
 		GLuint shader_prog;
 
@@ -47,6 +48,7 @@ namespace shader
 		void setUniform(Uniform location, float value);
 		void setUniform(Uniform location, const Vector3& value);
 		void setUniform(Uniform location, const Matrix4& value);
+		void setUniform(Uniform location, const Texture& texture);
 
 		enum Type
 		{

@@ -60,6 +60,10 @@ namespace shader
 	{
 		glUniformMatrix4fv(location, 1, GL_FALSE, (GLfloat*)& value);
 	}
+	void Shader::setUniform(Uniform location, const Texture& texture)
+	{
+		glUniform1i(location, texture.getId());
+	}
 
 	ShaderCompiler::ShaderCompiler()
 		: vertex(0), geometry(0), fragment(0) {}
@@ -93,7 +97,7 @@ namespace shader
 				std::string shader_message;
 				shader_message.resize(log_length);
 				glGetShaderInfoLog(shader_id, log_length, nullptr, &shader_message[0]);
-				throw shader_error(shader_message);
+				throw shader_error(shader_message.c_str());
 			}
 			if (message)
 			{
@@ -164,7 +168,7 @@ namespace shader
 				std::string error;
 				error.resize(log_length);
 				glGetProgramInfoLog(out_shader, log_length, nullptr, &error[0]);
-				throw shader_error(error);
+				throw shader_error(error.c_str());
 			}
 			if (message)
 			{

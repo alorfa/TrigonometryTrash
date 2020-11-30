@@ -13,6 +13,7 @@ namespace my
 	public:
 		VertexBuffer v_buffer{0};
 		ColorBuffer3f c_buffer{1};
+		TexCoordsBuffer cord_buffer{2};
 
 		void setVertexBuffer(const std::vector<Point2D>& v)
 		{
@@ -21,6 +22,10 @@ namespace my
 		void setColorBuffer(const std::vector<Color3f>& v)
 		{
 			c_buffer.add(v);
+		}
+		void setCoordsBuffer(const std::vector<hlvl::vector::Vector2>& v)
+		{
+			cord_buffer.add(v);
 		}
 	};
 }

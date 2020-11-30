@@ -164,5 +164,6 @@ namespace buffer
 	using ColorBuffer3b = DrawableBuffer<Color3b, 3, GL_BYTE>;
 	using ColorBuffer4b = DrawableBuffer<Color4b, 4, GL_BYTE>;
 
+	using TexCoordsBuffer = DrawableBuffer<Vector2, 2, GL_FLOAT>;
 }
 }

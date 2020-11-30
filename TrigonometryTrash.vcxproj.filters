@@ -3,7 +3,6 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\small_definitions.cpp" />
-    <ClCompile Include="src\exception.cpp" />
     <ClCompile Include="src\Graphics\AppInit.cpp" />
     <ClCompile Include="src\Graphics\Shader.cpp" />
     <ClCompile Include="src\Graphics\Camera.cpp" />
@@ -12,6 +11,9 @@
     <ClCompile Include="src\System\Clock.cpp" />
     <ClCompile Include="src\System\FpsMenager.cpp" />
     <ClCompile Include="src\Graphics\Image\Image.cpp" />
+    <ClCompile Include="src\System\exception.cpp" />
+    <ClCompile Include="src\Graphics\Image\Texture.cpp" />
+    <ClCompile Include="src\Graphics\Image\stb_image.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header\header.hpp" />
@@ -31,5 +33,6 @@
     <ClInclude Include="header\System\FpsMenager.hpp" />
     <ClInclude Include="header\Graphics\Image\Image.hpp" />
     <ClInclude Include="header\Graphics\Image\ImageLoader.hpp" />
+    <ClInclude Include="header\Graphics\Image\Texture.hpp" />
   </ItemGroup>
 </Project>
