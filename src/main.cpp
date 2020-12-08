@@ -10,11 +10,12 @@
 #include "Graphics/Vector.hpp"
 #include <Graphics/Transformable.hpp>
 #include <ctime>
-#include "Graphics/TestObject.hpp"
+#include "TestClasses/TestObject.hpp"
 #include "System/Clock.hpp"
 #include "System/FpsMenager.hpp"
 #include "Graphics/Image/Image.hpp"
 #include "Graphics/Image/Texture.hpp"
+#include "TestClasses/Sprite.hpp"
 
 std::ostream& operator<<(std::ostream&, const glm::mat3&);
 std::ostream& operator<<(std::ostream&, const glm::mat4&);
@@ -30,6 +31,7 @@ using namespace hlvl::fps_menager;
 using namespace hlvl::image;
 using namespace my;
 using namespace hlvl::texture;
+using namespace sprite;
 
 std::ostream& operator<<(std::ostream& stream, const Transform& t)
 {
@@ -45,31 +47,41 @@ int main()
 	hlvl::GLFW just_glfw;
 	Window window;
 
-	if (!just_glfw.init())
+	if (not just_glfw.init())
 	{
 		std::cerr << "GLFW cannot be initialized" << std::endl;
 		exit(1);
 	}
+	
+	/*
+	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	/**/
 
-	if (!window.create(800, 800, "title"))
+	if (not window.create(800, 1000, "title"))
 	{
 		std::cerr << "Window cannot be created" << std::endl;
 		exit(1);
 	}
 
 	//open shaders
-	ShaderCompiler compiler;
 	Shader shader;
 	Uniform uni_matrix;
 	Uniform uni_texture;
+	Uniform uni_texture2;
 	try
 	{
 		std::string s1, s2, s3;
+		ShaderCompiler compiler;
 		compiler.loadFromFile("shader/texture.vert", Shader::Vertex, &s1);
 		compiler.loadFromFile("shader/texture.frag", Shader::Fragment, &s2);
 		shader = compiler.link(&s3);
 		uni_matrix = shader.getLocation("transform");
 		uni_texture = shader.getLocation("img");
+		uni_texture2 = shader.getLocation("img2");
 
 		std::cout << s1 << ' ' << s2 << ' ' << s3 << std::endl;
 	}
@@ -85,109 +97,71 @@ int main()
 	}
 
 	Camera camera;
-	my::TestObject testObject;
-	testObject.setVertexBuffer({
-		{-0.5f, -0.7f},
-		{0.5f, 0.7f},
-		{0.5f, -0.7f},
-		{-0.5f, -0.7f},
-		{0.5f, 0.7f},
-		{-0.5f, 0.7f}
-	});
-	testObject.v_buffer.updateData();
-	/*
-	testObject.setColorBuffer({
-		{1.f, 1.f, 0.f},
-		{1.f, 1.f, 1.f},
-		{0.2f, 1.f, 1.f},
-		{1.f, 1.f, 0.f},
-		{1.f, 1.f, 1.f},
-		{1.f, 1.f, 0.f},
-	});/**/
-	testObject.setColorBuffer({
-		{1.f, 0.f, 1.f},
-		{1.f, 0.f, 1.f},
-		{1.f, 0.f, 1.f},
-		{1.f, 0.f, 1.f},
-		{1.f, 0.f, 1.f},
-		{1.f, 0.f, 1.f},
-		});
-	testObject.c_buffer.updateData();
-	testObject.setCoordsBuffer({
-		{0.f, 1.f},
-		{1.f, 0.f},
-		{1.f, 1.f},
-		{0.f, 1.f},
-		{1.f, 0.f},
-		{0.f, 0.f}
-	});
-	testObject.cord_buffer.updateData();
 
-	Color3f fill_color(0.2f, 0.0f, 0.3f);
+	Color3f fill_color(0.0f, 0.0f, 0.0f);
 
 	FpsMenager fps_menager;
-	fps_menager.setFps(60);
+	//fps_menager.setFps(60);
 
-	Image img;
+	Sprite sprite;
+	Texture texture;
 	try
 	{
+		Image img;
 		img.loadFromFile("images/image.jpg");
+		texture.setImage(img);
 	}
 	catch (hlvl::image_error& e)
 	{
 		std::cerr << e.message << std::endl;
+		exit(1);
 	}
-	//PRINT(img.getSize());
-	//PRINT(img.getPixel({350, 500}));
-	Texture texture;
-	texture.setImage(img);
+	sprite.setTexture(texture);
+
+	try
+	{
+		Shader::getShader(Shader::Inbuilt::TexturedVertexes);
+	}
+	catch (hlvl::shader_error& e)
+	{
+		std::cout << e.message << std::endl;
+		exit(1);
+	}
 
 	float delta = 0.f;
+	
+	sprite.setScale(0.7f, 0.7f);
 
 	bool window_will_close = false;
 	while (window.isOpen())
 	{
 		delta = fps_menager.getDelta();
-		fps_menager.beginOfRendering();
+		//fps_menager.beginOfRendering();
 
 		if (window.shouldClose())
 			window_will_close = true;
 
-		window.clear(fill_color);
-
+		if (GetAsyncKeyState('W'))
+			sprite.move(0.f, 1.50f * delta);
+		if (GetAsyncKeyState('S'))
+			sprite.move(0.f, -1.50f * delta);
 		if (GetAsyncKeyState('D'))
-		{
-			testObject.move(0.50f * delta, 0.f);
-		}
+			sprite.move(1.50f * delta, 0.f);
 		if (GetAsyncKeyState('A'))
-		{
-			testObject.move(-0.50f * delta, 0.f);
-		}
-		Matrix4 mvp;
-		mvp = camera.getMatrix() * testObject.getMatrix();
-		//PRINTR(delta);
+			sprite.move(-1.50f * delta, 0.f);
+		if (GetAsyncKeyState(VK_UP))
+			sprite.setTextureRect( { 0, 0 }, { 300, 300 } );
+		if (GetAsyncKeyState(VK_DOWN))
+			sprite.setTextureRect({ 0, 0 }, texture.getSize());
 
-		texture.activate();
-
-
-		Shader::use(&shader);
-		shader.setUniform(uni_matrix, mvp);
-		shader.setUniform(uni_texture, texture);
-
-		testObject.v_buffer.activate();
-		testObject.c_buffer.activate();
-		testObject.cord_buffer.activate();
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		testObject.cord_buffer.deactivate();
-		testObject.c_buffer.deactivate();
-		testObject.v_buffer.deactivate();
-
+		window.clear(fill_color);
+		window.draw(sprite);
 		window.display();		
 
 		if (window_will_close)
 			window.close();
 
-		fps_menager.endOfRendering();
+		//fps_menager.endOfRendering();
 	}
 
 	return 0;

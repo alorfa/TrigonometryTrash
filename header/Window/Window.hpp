@@ -8,18 +8,19 @@
 
 #include "Graphics/Vector.hpp"
 #include <Graphics/Camera.hpp>
+#include "Graphics/Drawable.hpp"
 
 namespace hlvl
 {
 namespace window
 {
 
-
 	class Window
 	{
 		using CameraBase = camera::CameraBase;
 		using Color3f = vector::Color3f;
 		using Color3b = vector::Color3b;
+		using Drawable = drawable::Drawable;
 
 		GLFWwindow* window;
 
@@ -45,9 +46,9 @@ namespace window
 
 		void clear(const Color3b& fill);
 		void clear(const Color3f& fill);
+		void draw(const Drawable& object);
 		void display();
 	};
-
 
 }
 }

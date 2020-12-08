@@ -12,6 +12,12 @@ namespace hlvl
 {
 namespace buffer
 {
+	enum class PrimitiveType
+	{
+		Points,
+		Lines,
+		Triangles
+	};
 
 	template <typename T>
 	class Buffer
@@ -59,8 +65,6 @@ namespace buffer
 
 			other.buf = 0;
 
-			PRINT(other.data.empty());
-
 			return *this;
 		}
 		Buffer& operator=(const std::vector<T>& vector)
@@ -68,6 +72,10 @@ namespace buffer
 			data = vector;
 
 			return *this;
+		}
+		void setData(const std::vector<T>& vector)
+		{
+			data = vector;
 		}
 		Buffer& operator=(std::vector<T>&& vector)
 		{
@@ -134,26 +142,34 @@ namespace buffer
 			glBindBuffer(GL_ARRAY_BUFFER, this->buf);
 			glBufferData(GL_ARRAY_BUFFER, this->data.size() * sizeof(T), &this->data[0], GL_STATIC_DRAW);
 		}
-		void activate()
+		void activate() const
 		{
 			glEnableVertexAttribArray(attribute);
 			glBindBuffer(GL_ARRAY_BUFFER, this->buf);
 			glVertexAttribPointer(attribute, components_count, type, GL_FALSE, 0, nullptr);
 		}
-		void deactivate()
+		void deactivate() const
 		{
 			glDisableVertexAttribArray(attribute);
 		}
 	};
 
-	template <typename T>
-	class IndexBuffer : public Buffer<T>
+	template <typename T, GLenum type>
+	class IndexBufferTemplate : public Buffer<T>
 	{
 	public:
 		void updateData()
 		{
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buf);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->data.size() * sizeof(T), &this->data[0], GL_STATIC_DRAW);
+		}
+		void activate() const
+		{
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buf);
+		}
+		void drawArrays() const
+		{
+			glDrawElements(GL_TRIANGLES, (GLsizei)this->data.size(), type, nullptr);
 		}
 	};
 
@@ -165,5 +181,7 @@ namespace buffer
 	using ColorBuffer4b = DrawableBuffer<Color4b, 4, GL_BYTE>;
 
 	using TexCoordsBuffer = DrawableBuffer<Vector2, 2, GL_FLOAT>;
+
+	using IndexBuffer = IndexBufferTemplate<GLuint, GL_UNSIGNED_INT>;
 }
 }

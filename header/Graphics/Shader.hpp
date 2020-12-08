@@ -38,22 +38,29 @@ namespace shader
 		GLuint getNativeHandle() const;
 
 		/* Uses the shader. If it is nullptr then shader unbind*/
-		static void use(Shader* shader);
+		void use() const;
 
 		/*
 		* Возвращает location для дальнейшего использования в setUniform.
 		* В случае ошибки возвращает -1
 		*/
-		Uniform getLocation(const char* name);
-		void setUniform(Uniform location, float value);
-		void setUniform(Uniform location, const Vector3& value);
-		void setUniform(Uniform location, const Matrix4& value);
-		void setUniform(Uniform location, const Texture& texture);
+		Uniform getLocation(const char* name) const;
+		void setUniform(Uniform location, float value) const;
+		void setUniform(Uniform location, const Vector3& value) const;
+		void setUniform(Uniform location, const Matrix4& value) const;
+		void setUniform(Uniform location, const Texture& texture) const;
 
 		enum Type
 		{
 			Vertex, Geometry, Fragment
 		};
+		enum Inbuilt
+		{
+			TexturedVertexes,
+			ColoredVertexes
+		};
+
+		static const Shader& getShader(Inbuilt shader);
 	};
 	class ShaderCompiler
 	{

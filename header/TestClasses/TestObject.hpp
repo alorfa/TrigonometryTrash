@@ -7,8 +7,9 @@ namespace my
 {
 	using namespace hlvl::buffer;
 	using namespace hlvl::vector;
+	using namespace hlvl::transform;
 
-	class TestObject : public hlvl::transform::Transformable
+	class TestObject : public Transformable
 	{
 	public:
 		VertexBuffer v_buffer{0};

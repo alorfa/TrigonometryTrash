@@ -3,6 +3,67 @@
 #include "System/exception.hpp"
 #include "header.hpp"
 
+namespace shader_sources
+{
+	static const char* textured_vertexes_vert =
+		"#version 330\n"
+
+		"layout(location = 0) in vec2 input_pos;"
+		"layout(location = 2) in vec2 input_UV;"
+
+		"out vec2 frag_UV;"
+
+		"uniform mat4 transform;"
+
+		"void main()"
+		"{"
+		"	gl_Position = transform * vec4(input_pos, 0, 1);"
+		"	frag_UV = input_UV;"
+		"}";
+
+	static const char* textured_vertexes_frag =
+		"#version 330\n"
+
+		"in vec2 frag_UV;"
+
+		"uniform sampler2D img;"
+
+		"out vec4 color;"
+
+		"void main()"
+		"{"
+		"	color = texture(img, frag_UV);"
+		"}";
+
+	static const char* colored_vertexes_vert =
+		"#version 330\n"
+
+		"layout(location = 0) in vec2 input_pos;"
+		"layout(location = 1) in vec3 input_color;"
+
+		"out vec3 fragment_color;"
+
+		"uniform mat4 transform;"
+
+		"void main()"
+		"{"
+		"	gl_Position = transform * vec4(input_pos, 0, 1);"
+		"	fragment_color = input_color;"
+		"}";
+
+	static const char* colored_vertexes_frag =
+		"#version 330\n"
+
+		"in vec3 fragment_color;"
+
+		"out vec4 color;"
+
+		"void main()"
+		"{"
+		"	color = vec4(fragment_color, 1);"
+		"}";
+}
+
 namespace hlvl
 {
 namespace shader
@@ -37,32 +98,60 @@ namespace shader
 	{
 		return shader_prog;
 	}
-	void Shader::use(Shader* shader)
+	void Shader::use() const
 	{
-		if (shader)
-			glUseProgram(shader->shader_prog);
-		else
-			glUseProgram(0);
+		glUseProgram(this->shader_prog);
 	}
-	Uniform Shader::getLocation(const char* name)
+	Uniform Shader::getLocation(const char* name) const
 	{
 		return glGetUniformLocation(shader_prog, name);
 	}
-	void Shader::setUniform(Uniform location, float value)
+	void Shader::setUniform(Uniform location, float value) const
 	{
 		glUniform1f(location, value);
 	}
-	void Shader::setUniform(Uniform location, const Vector3& value)
+	void Shader::setUniform(Uniform location, const Vector3& value) const
 	{
 		glUniform3f(location, value.x, value.y, value.z);
 	}
-	void Shader::setUniform(Uniform location, const Matrix4& value)
+	void Shader::setUniform(Uniform location, const Matrix4& value) const
 	{
 		glUniformMatrix4fv(location, 1, GL_FALSE, (GLfloat*)& value);
 	}
-	void Shader::setUniform(Uniform location, const Texture& texture)
+	void Shader::setUniform(Uniform location, const Texture& texture) const
 	{
 		glUniform1i(location, texture.getId());
+	}
+
+	const Shader& Shader::getShader(Inbuilt shader)
+	{
+		static Shader
+			textured_vertexes, colored_vertexes;
+
+		static bool first_call = true;
+		if (first_call)
+		{
+			first_call = false;
+
+			ShaderCompiler compiler;
+			using namespace shader_sources;
+
+			compiler.loadFromMemory(textured_vertexes_vert, Type::Vertex);
+			compiler.loadFromMemory(textured_vertexes_frag, Type::Fragment);
+			textured_vertexes = compiler.link();
+
+			compiler.loadFromMemory(colored_vertexes_vert, Type::Vertex);
+			compiler.loadFromMemory(colored_vertexes_frag, Type::Fragment);
+			colored_vertexes = compiler.link();
+		}
+
+		switch (shader)
+		{
+		case Inbuilt::TexturedVertexes:
+			return textured_vertexes;
+		case Inbuilt::ColoredVertexes:
+			return colored_vertexes;
+		}
 	}
 
 	ShaderCompiler::ShaderCompiler()
